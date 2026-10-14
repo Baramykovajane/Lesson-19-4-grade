@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Where is it? Inside, outside, upstairs, downstairs, above, below</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef6fb;--card:#fff;--ink:#1f2a44;--muted:#5a6683;--line:#c9d6e8;--main:#4b50c8;--ok:#1f9d57;--bad:#d6334f;--hl:#ff3d81;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a2b;--card:#1d2540;--ink:#eef1fb;--muted:#a9b3d1;--line:#38426a;--main:#8e92ff}}
+:root[data-theme="dark"]{--bg:#141a2b;--card:#1d2540;--ink:#eef1fb;--muted:#a9b3d1;--line:#38426a;--main:#8e92ff}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito","Segoe UI",Arial,sans-serif;font-weight:600;line-height:1.5}
+main{max-width:760px;margin:0 auto;padding:16px 14px 48px}
+h1{font-size:clamp(1.8rem,6vw,2.6rem);font-weight:900;margin:8px 0 4px;line-height:1.1}
+h2{font-size:1.4rem;font-weight:900;margin:0 0 6px}
+p{margin:6px 0}
+.sub{color:var(--muted)}
+section{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:16px;margin:18px 0}
+svg.scene{width:100%;height:auto;display:block;border-radius:16px;border:2px solid var(--line);touch-action:manipulation}
+.ch{font-size:30px;text-anchor:middle;transition:transform .2s}
+.ch.hl{animation:pulse 0.9s ease-in-out infinite;filter:drop-shadow(0 0 5px var(--hl)) drop-shadow(0 0 2px var(--hl))}
+@keyframes pulse{50%{font-size:38px}}
+@media (prefers-reduced-motion:reduce){.ch.hl{animation:none}}
+.zone{fill:transparent;stroke:none}
+.zone.on{fill:rgba(255,61,129,.28);stroke:var(--hl);stroke-width:3;stroke-dasharray:7 5}
+.tap .zone{cursor:pointer}
+.tap .zone:hover{fill:rgba(75,80,200,.18)}
+.words{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}
+.w{border:2px solid var(--line);border-radius:16px;background:var(--card);color:var(--ink);font:inherit;text-align:left;padding:10px 12px;cursor:pointer}
+.w:focus-visible,.opt:focus-visible,button:focus-visible,select:focus-visible,.zone:focus-visible{outline:3px solid var(--main);outline-offset:2px}
+.w b{font-size:1.25rem;font-weight:900;color:var(--main)}
+.w.sel{border-color:var(--hl);background:rgba(255,61,129,.1)}
+.w i{display:block;font-style:normal;color:var(--muted);font-size:.95rem}
+.w em{display:block;font-style:normal}
+.q{border-top:2px dashed var(--line);padding-top:12px;margin-top:12px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.opt,.btn{font:inherit;font-weight:800;border:2px solid var(--main);background:transparent;color:var(--main);padding:8px 16px;border-radius:999px;cursor:pointer}
+.opt:hover:not(:disabled){background:var(--main);color:#fff}
+.opt.right{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.wrong{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn{background:var(--main);color:#fff}
+.fb{min-height:1.5em;font-weight:800}
+.score{font-weight:900;color:var(--main)}
+.gap{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:8px 0;border-bottom:1px dashed var(--line)}
+select{font:inherit;font-weight:800;border:2px solid var(--main);border-radius:10px;padding:4px 6px;background:var(--card);color:var(--ink)}
+select.right{border-color:var(--ok);background:rgba(31,157,87,.15)}
+select.wrong{border-color:var(--bad);background:rgba(214,51,79,.15)}
+.hint{color:var(--muted);font-size:.9rem}
+#final{text-align:center;font-size:1.3rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Where is it? 🏠</h1>
+<p class="sub">English, Grade 4 · Place words: inside, outside, upstairs, downstairs, above, below</p>
+
+<section id="s1">
+<h2>1. Learn the words · Вивчи слова</h2>
+<p>Натисни на слово — і побачиш це місце на малюнку будинку.</p>
+<div id="house1"></div>
+<div class="words" id="words"></div>
+</section>
+
+<section id="s2">
+<h2>2. Look and choose · Подивись і обери</h2>
+<p>Персонаж блимає на малюнку. Обери правильне слово. <span class="score" id="sc2"></span></p>
+<div id="house2"></div>
+<div id="quiz"></div>
+</section>
+
+<section id="s3">
+<h2>3. Tap the place · Натисни на місце</h2>
+<p>Прочитай завдання й натисни на потрібну частину малюнка. <span class="score" id="sc3"></span></p>
+<div id="house3" class="tap"></div>
+<p class="fb" id="tapq" style="font-size:1.2rem"></p>
+<p class="fb" id="tapfb"></p>
+</section>
+
+<section id="s4">
+<h2>4. Fill in the gaps · Встав слово</h2>
+<p>Обери слово у списку. Дивись на малюнок: <span class="hint">cat, dog, girl, boy, bird, ball, bike, worm</span></p>
+<div id="house4"></div>
+<div id="gaps"></div>
+<p><button class="btn" id="chk">Check · Перевірити</button> <span class="score" id="sc4"></span></p>
+</section>
+
+<section id="final" hidden></section>
+<p style="text-align:center"><button class="btn" onclick="location.reload()">Start again · Спочатку</button></p>
+</main>
+
+<script>
+const ZONES={
+ upstairs:[[100,90,200,85]],
+ downstairs:[[100,175,200,80]],
+ inside:[[100,90,200,85],[100,175,200,80]],
+ outside:[[0,90,100,165],[300,90,100,165]],
+ above:[[0,0,400,90]],
+ below:[[0,268,400,32]]
+};
+function scene(id,withZones){
+ const z=withZones?Object.keys(ZONES).filter(k=>k!=='inside').map(k=>ZONES[k].map(r=>`<rect class="zone" data-z="${k}" tabindex="0" role="button" aria-label="${k}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`).join('')).join(''):
+ Object.keys(ZONES).map(k=>ZONES[k].map(r=>`<rect class="zone" data-z="${k}" x="${r[0]}" y="${r[1]}" width="${r[2]}" height="${r[3]}"/>`).join('')).join('');
+ return `<svg class="scene" viewBox="0 0 400 300" role="img" aria-label="A house with two floors, a garden and the ground below">
+<rect width="400" height="258" fill="#bfe3f6"/><circle cx="360" cy="38" r="20" fill="#ffd23f"/>
+<ellipse cx="70" cy="40" rx="30" ry="12" fill="#fff"/><ellipse cx="92" cy="34" rx="22" ry="11" fill="#fff"/>
+<rect y="255" width="400" height="14" fill="#6cc070"/><rect y="269" width="400" height="31" fill="#a9744f"/>
+<rect x="100" y="90" width="200" height="165" fill="#fff3d6" stroke="#7a5c3e" stroke-width="3"/>
+<rect x="100" y="172" width="200" height="7" fill="#7a5c3e"/>
+<polygon points="84,92 200,30 316,92" fill="#5b5fc7" stroke="#3d3f94" stroke-width="3"/>
+<rect x="186" y="108" width="38" height="32" fill="#9fd8f5" stroke="#7a5c3e" stroke-width="3"/>
+<rect x="183" y="204" width="34" height="51" rx="4" fill="#a0522d"/><circle cx="209" cy="232" r="3" fill="#ffd23f"/>
+<polygon points="272,255 299,255 299,180 288,180 288,200 280,200 280,228 272,228" fill="#c99a6b" stroke="#7a5c3e" stroke-width="2"/>
+<text x="38" y="252" font-size="46" text-anchor="middle">🌳</text>
+<text class="ch" data-k="ball" x="72" y="252" style="font-size:24px">⚽</text>
+<text class="ch" data-k="bike" x="350" y="252">🚲</text>
+<text class="ch" data-k="cat" x="136" y="166">🐱</text>
+<text class="ch" data-k="girl" x="250" y="166">👧</text>
+<text class="ch" data-k="boy" x="135" y="250">👦</text>
+<text class="ch" data-k="dog" x="240" y="250" style="transform:scaleX(1)">🐶</text>
+<text class="ch" data-k="bird" x="200" y="20">🐦</text>
+<text class="ch" data-k="worm" x="200" y="293" style="font-size:22px">🐛</text>
+${z}</svg>`;
+}
+['1','2','3','4'].forEach(n=>document.getElementById('house'+n).innerHTML=scene(n,n==='3'));
+const $=s=>document.querySelector(s);
+const score={2:0,3:0,4:0},max={2:6,3:6,4:8};
+
+/* 1. Explanation */
+const WORDS=[
+ ['inside','всередині','The girl is inside the house.'],
+ ['outside','надворі, зовні','The bike is outside the house.'],
+ ['upstairs','нагорі (на другому поверсі)','The cat is upstairs.'],
+ ['downstairs','внизу (на першому поверсі)','The dog is downstairs.'],
+ ['above','над, вище','The bird is above the house.'],
+ ['below','під, нижче','The worm is below the grass.']
+];
+const hl1={inside:'girl',outside:'bike',upstairs:'cat',downstairs:'dog',above:'bird',below:'worm'};
+$('#words').innerHTML=WORDS.map(w=>`<button class="w" data-w="${w[0]}"><b>${w[0]}</b><i>${w[1]}</i><em>${w[2]}</em></button>`).join('');
+$('#words').addEventListener('click',e=>{
+ const b=e.target.closest('.w');if(!b)return;
+ const k=b.dataset.w;
+ document.querySelectorAll('.w').forEach(x=>x.classList.toggle('sel',x===b));
+ const svg=$('#house1 svg');
+ svg.querySelectorAll('.zone').forEach(r=>r.classList.remove('on'));
+ svg.querySelectorAll('.ch').forEach(r=>r.classList.remove('hl'));
+ svg.querySelectorAll(`.zone[data-z="${k}"]`).forEach(r=>r.classList.add('on'));
+ if(k==='inside'){svg.querySelectorAll('.zone[data-z="upstairs"],.zone[data-z="downstairs"]').forEach(r=>r.classList.add('on'))}
+ svg.querySelector(`.ch[data-k="${hl1[k]}"]`).classList.add('hl');
+ if('speechSynthesis' in window){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(k);u.lang='en-GB';speechSynthesis.speak(u)}catch(_){}}
+});
+
+/* 2. Quiz */
+const Q=[
+ ['cat','Where is the cat?','upstairs',['upstairs','downstairs','outside','below']],
+ ['dog','Where is the dog?','downstairs',['downstairs','upstairs','above','outside']],
+ ['ball','Where is the ball?','outside',['outside','inside','above','below']],
+ ['bird','Where is the bird?','above',['above','below','inside','downstairs']],
+ ['worm','Where is the worm?','below',['below','above','upstairs','inside']],
+ ['girl','The girl is ___ the house.','inside',['inside','outside','above','below']]
+];
+let qi=0;
+function showQ(){
+ const svg=$('#house2 svg');svg.querySelectorAll('.ch').forEach(c=>c.classList.remove('hl'));
+ if(qi>=Q.length){$('#quiz').innerHTML='<p class="fb" style="color:var(--ok)">🎉 Well done!</p>';return}
+ const q=Q[qi];svg.querySelector(`.ch[data-k="${q[0]}"]`).classList.add('hl');
+ $('#quiz').innerHTML=`<div class="q"><b>${qi+1}/${Q.length}. ${q[1]}</b><div class="opts">${q[3].map(o=>`<button class="opt" data-o="${o}">${o}</button>`).join('')}</div><p class="fb" id="fb2"></p></div>`;
+}
+$('#quiz').addEventListener('click',e=>{
+ const b=e.target.closest('.opt');if(!b||b.disabled)return;
+ const q=Q[qi];
+ if(b.dataset.o===q[2]){b.classList.add('right');score[2]++;$('#fb2').textContent='✔ Correct!';$('#fb2').style.color='var(--ok)';
+  document.querySelectorAll('#quiz .opt').forEach(x=>x.disabled=true);
+  $('#sc2').textContent=`⭐ ${score[2]}/${max[2]}`;qi++;setTimeout(showQ,1100);}
+ else{b.classList.add('wrong');b.disabled=true;$('#fb2').textContent='✘ Try again!';$('#fb2').style.color='var(--bad)';}
+});
+showQ();
+
+/* 3. Tap */
+const T=[
+ ['Tap UPSTAIRS.','upstairs'],['Tap DOWNSTAIRS.','downstairs'],['Tap OUTSIDE the house.','outside'],
+ ['Tap the place ABOVE the house.','above'],['Tap the place BELOW the grass.','below'],['Tap INSIDE the house.','inside']
+];
+let ti=0;
+function showT(){
+ if(ti>=T.length){$('#tapq').textContent='🎉 Great job!';return}
+ $('#tapq').textContent=`${ti+1}/${T.length}. ${T[ti][0]}`;
+}
+function tapZone(z){
+ if(ti>=T.length)return;
+ const want=T[ti][1];
+ const ok=want==='inside'?(z==='upstairs'||z==='downstairs'):z===want;
+ const fb=$('#tapfb');
+ if(ok){
+  score[3]++;fb.textContent='✔ Correct!';fb.style.color='var(--ok)';
+  $('#sc3').textContent=`⭐ ${score[3]}/${max[3]}`;
+  const sel=want==='inside'?['upstairs','downstairs']:[want];
+  const rs=[...document.querySelectorAll('#house3 .zone')].filter(r=>sel.includes(r.dataset.z));
+  rs.forEach(r=>r.classList.add('on'));
+  ti++;setTimeout(()=>{rs.forEach(r=>r.classList.remove('on'));fb.textContent='';showT();},1100);
+ }else{fb.textContent='✘ Not here. Try again!';fb.style.color='var(--bad)';}
+}
+$('#house3').addEventListener('click',e=>{const r=e.target.closest('.zone');if(r)tapZone(r.dataset.z)});
+$('#house3').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('zone')){e.preventDefault();tapZone(e.target.dataset.z)}});
+showT();
+
+/* 4. Gaps */
+const G=[
+ ['The bird is','above','the roof.'],['The worm is','below','the grass.'],['The bike is','outside','the house.'],
+ ['The boy and the dog are','downstairs','.'],['The cat is','upstairs','.'],['The girl is','inside','the house.'],
+ ['The cat is','above','the dog.'],['The dog is','below','the cat.']
+];
+const opts='<option value="">...</option>'+['inside','outside','upstairs','downstairs','above','below'].map(w=>`<option>${w}</option>`).join('');
+$('#gaps').innerHTML=G.map((g,i)=>`<div class="gap">${i+1}. ${g[0]} <select data-i="${i}">${opts}</select> ${g[2]}</div>`).join('');
+$('#chk').addEventListener('click',()=>{
+ let s=0;
+ document.querySelectorAll('#gaps select').forEach(sel=>{
+  sel.classList.remove('right','wrong');
+  if(!sel.value)return;
+  const ok=sel.value===G[sel.dataset.i][1];
+  sel.classList.add(ok?'right':'wrong');if(ok)s++;
+ });
+ score[4]=s;$('#sc4').textContent=`⭐ ${s}/${max[4]}`;
+ const total=score[2]+score[3]+score[4],all=max[2]+max[3]+max[4];
+ const f=$('#final');f.hidden=false;
+ f.innerHTML=`<b>Total: ${total}/${all}</b><br>${total===all?'🏆 Perfect! Excellent work!':total>all*0.7?'👏 Very good!':'💪 Keep practising!'}`;
+});
+</script>
+</body>
+</html>
